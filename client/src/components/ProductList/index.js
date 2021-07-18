@@ -1,17 +1,20 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
-import { useStoreContext } from '../../utils/GlobalState';
-import { UPDATE_PRODUCTS } from '../../utils/actions';
 import ProductItem from '../ProductItem';
 import { QUERY_PRODUCTS } from '../../utils/queries';
 import spinner from '../../assets/spinner.gif';
 import { idbPromise } from "../../utils/helpers";
+import { UPDATE_PRODUCTS } from '../../utils/reducers';
+import { useSelector, useDispatch } from 'react-redux'
 
 function ProductList() {
   //global state and update fx's
-  const [state, dispatch] = useStoreContext();
+  const state = useSelector((state) => state.product.value);
+  const dispatch = useDispatch();
+  
   //set current category to destructured state
   const { currentCategory } = state;
+  console.log(currentCategory);
   //query the database for products
   const { loading, data } = useQuery(QUERY_PRODUCTS);
 
@@ -21,10 +24,9 @@ function ProductList() {
     // if there's data to be stored
     if (data) {
       // let's store it in the global state object
-      dispatch({
-        type: UPDATE_PRODUCTS,
+      dispatch(UPDATE_PRODUCTS({
         products: data.products
-      });
+      }));
 
       // but let's also take each product and save it to IndexedDB using the helper function 
       data.products.forEach((product) => {
@@ -35,10 +37,9 @@ function ProductList() {
     // since we're offline, get all of the data from the `products` store
     idbPromise('products', 'get').then((products) => {
       // use retrieved data to set global state for offline browsing
-      dispatch({
-        type: UPDATE_PRODUCTS,
+      dispatch(UPDATE_PRODUCTS({
         products: products
-      });
+      }));
     });
   }
   }, [data, loading, dispatch]);
@@ -53,7 +54,7 @@ function ProductList() {
       return state.products;
     }
 
-    return state.products.filter(product => product.category._id === currentCategory);
+    return state.products.filter(product => product.category.name === currentCategory);
   }
 
 
