@@ -6,11 +6,10 @@ import { idbPromise } from "../../utils/helpers";
 import { QUERY_CHECKOUT } from '../../utils/queries';
 import { loadStripe } from '@stripe/stripe-js';
 import { useLazyQuery } from '@apollo/client';
-import STRIPE_URI from process.env.STRIPE_URI;
 import { TOGGLE_CART, ADD_MULTIPLE_TO_CART } from '../../utils/actions';
 import { useSelector, useDispatch } from 'react-redux'
 
-const stripePromise = loadStripe(STRIPE_URI);
+const stripePromise = loadStripe(process.env.STRIPE_URI);
 
 
 const Cart = () => {
