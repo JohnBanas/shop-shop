@@ -1,7 +1,7 @@
 const { AuthenticationError } = require('apollo-server-express');
 const { User, Product, Category, Order } = require('../models');
 const { signToken } = require('../utils/auth');
-const stripe = require('stripe')
+const stripe = require('stripe')('sk_test_4eC39HqLyjWDarjtT1zdp7dc');
 
 const resolvers = {
   Query: {
@@ -57,15 +57,16 @@ const resolvers = {
       const order = new Order({ products: args.products });
       const { products } = await order.populate('products').execPopulate();
       const line_items = [];
-
+      console.log(products);
       for (let i = 0; i < products.length; i++) {
+        
         // generate product id
         const product = await stripe.products.create({
           name: products[i].name,
           description: products[i].description,
           images: [`${url}/images/${products[i].image}`]
         });
-
+        
 
         // generate price id using the product id
         const price = await stripe.prices.create({
@@ -73,7 +74,7 @@ const resolvers = {
           unit_amount: products[i].price * 100,
           currency: 'usd',
         });
-
+        console.log(price);
         // add price id to the line items array
         line_items.push({
           price: price.id,

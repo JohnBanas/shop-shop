@@ -9,7 +9,7 @@ import { useLazyQuery } from '@apollo/client';
 import { TOGGLE_CART, ADD_MULTIPLE_TO_CART } from '../../utils/actions';
 import { useSelector, useDispatch } from 'react-redux'
 
-const stripePromise = loadStripe(process.env.STRIPE_URI);
+const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
 
 
 const Cart = () => {
@@ -19,7 +19,7 @@ const Cart = () => {
   
 
   const [getCheckout, { data }] = useLazyQuery(QUERY_CHECKOUT);
-
+  
   useEffect(() => {
     async function getCart() {
       const cart = await idbPromise('cart', 'get');
@@ -33,6 +33,7 @@ const Cart = () => {
 
   useEffect(() => {
     if (data) {
+      console.log(data);
       stripePromise.then((res) => {
         res.redirectToCheckout({ sessionId: data.checkout.session });
       });
@@ -52,12 +53,14 @@ const Cart = () => {
   };
 
   function submitCheckout() {
+    console.log('submit checkout function');
     const productIds = [];
 
     state.cart.forEach((item) => {
       for (let i = 0; i < item.purchaseQuantity; i++) {
         productIds.push(item._id);
       }
+      console.log(productIds);
     });
     getCheckout({
       variables: { products: productIds }
