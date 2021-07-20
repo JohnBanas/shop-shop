@@ -4,29 +4,30 @@ import ProductItem from '../ProductItem';
 import { QUERY_PRODUCTS } from '../../utils/queries';
 import spinner from '../../assets/spinner.gif';
 import { idbPromise } from "../../utils/helpers";
-import { UPDATE_PRODUCTS } from '../../utils/reducers';
+import { UPDATE_PRODUCTS } from '../../utils/actions';
 import { useSelector, useDispatch } from 'react-redux'
 
 function ProductList() {
   //global state and update fx's
-  const state = useSelector((state) => state.product.value);
+  const state = useSelector((state) => state);
   const dispatch = useDispatch();
   
   //set current category to destructured state
   const { currentCategory } = state;
-  console.log(currentCategory);
+  
   //query the database for products
   const { loading, data } = useQuery(QUERY_PRODUCTS);
-
+  
   //use effect to on load try to get the query data
   //or if data loads, then update global state with new products
   useEffect(() => {
     // if there's data to be stored
     if (data) {
       // let's store it in the global state object
-      dispatch(UPDATE_PRODUCTS({
+      dispatch({
+        type: UPDATE_PRODUCTS,
         products: data.products
-      }));
+      });
 
       // but let's also take each product and save it to IndexedDB using the helper function 
       data.products.forEach((product) => {
@@ -37,9 +38,10 @@ function ProductList() {
     // since we're offline, get all of the data from the `products` store
     idbPromise('products', 'get').then((products) => {
       // use retrieved data to set global state for offline browsing
-      dispatch(UPDATE_PRODUCTS({
+      dispatch({
+        type: UPDATE_PRODUCTS,
         products: products
-      }));
+      });
     });
   }
   }, [data, loading, dispatch]);
@@ -54,10 +56,10 @@ function ProductList() {
       return state.products;
     }
 
-    return state.products.filter(product => product.category.name === currentCategory);
+    return state.products.filter(product => product.category._id === currentCategory);
   }
-
-
+  
+  
 
   return (
     <div className="my-2">

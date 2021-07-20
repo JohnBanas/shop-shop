@@ -7,7 +7,7 @@ import { QUERY_CHECKOUT } from '../../utils/queries';
 import { loadStripe } from '@stripe/stripe-js';
 import { useLazyQuery } from '@apollo/client';
 import STRIPE_URI from '../../.env';
-import { TOGGLE_CART, ADD_MULTIPLE_TO_CART } from '../../utils/reducers';
+import { TOGGLE_CART, ADD_MULTIPLE_TO_CART } from '../../utils/actions';
 import { useSelector, useDispatch } from 'react-redux'
 
 const stripePromise = loadStripe(STRIPE_URI);
@@ -15,7 +15,7 @@ const stripePromise = loadStripe(STRIPE_URI);
 
 const Cart = () => {
   //uses global state 'state' and updates state with 'dispatch' 
-  const state = useSelector((state) => state.product.value);
+  const state = useSelector((state) => state);
   const dispatch = useDispatch();
   
 
@@ -24,7 +24,7 @@ const Cart = () => {
   useEffect(() => {
     async function getCart() {
       const cart = await idbPromise('cart', 'get');
-      dispatch(ADD_MULTIPLE_TO_CART({ products: [...cart] }));
+      dispatch({type: ADD_MULTIPLE_TO_CART, products: [...cart] });
     };
 
     if (!state.cart.length) {
@@ -41,7 +41,7 @@ const Cart = () => {
   }, [data]);
 
   function toggleCart() {
-    dispatch(TOGGLE_CART());
+    dispatch({type:TOGGLE_CART});
   };
 
   function calculateTotal() {

@@ -1,15 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit';
-import  {productReducer}  from './reducers';
+import { createStore } from 'redux';
+import { reducer, initialState } from './reducers';
 
-console.log(productReducer);
+export const store = createStore(reducer, initialState);
 
-export const store = configureStore({
-  reducer: {
-    product: productReducer
-    } 
-});
 
-console.log(store);
+
 
 
 
