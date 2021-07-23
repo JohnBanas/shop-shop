@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const handleError = error => console.log(error);
+
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/mernshopping', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -7,6 +9,8 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/mernshopping', 
   useFindAndModify: false
 }).
   catch(error => handleError(error));
+
+const logError = err => console.log(err);
 
 mongoose.connection.on('error', err => {
   logError(err);
